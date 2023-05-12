@@ -1,0 +1,36 @@
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, Aer, execute
+import math
+
+# Crear un registro cuántico de 3 qubits y un registro clásico de 1 bit
+qr = QuantumRegister(3)
+cr = ClassicalRegister(1)
+
+# Crear el circuito cuántico
+qc = QuantumCircuit(qr, cr)
+
+# Preparar el estado |+> en el primer qubit
+qc.h(qr[0])
+
+# Preparar el estado |0> en el segundo qubit
+qc.x(qr[1])
+
+# Aplicar la compuerta de rotación controlada CROT entre el primer y segundo qubit
+qc.cu3(math.pi/2, 0, 0, qr[0], qr[1])
+
+# Aplicar la compuerta de rotación controlada CROT entre el primer y tercer qubit
+qc.cu3(math.pi/2, 0, 0, qr[0], qr[2])
+
+# Medir el tercer qubit
+qc.measure(qr[2], cr)
+
+# Ejecutar el circuito en un simulador
+backend = Aer.get_backend('qasm_simulator')
+job_sim = execute(qc, backend)
+sim_result = job_sim.result()
+counts = sim_result.get_counts(qc)
+
+# Calcular la dirección norte-sur
+if '0' in counts:
+    print("La brújula apunta hacia el norte")
+else:
+    print("La brújula apunta hacia el sur")
